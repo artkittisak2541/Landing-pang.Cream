@@ -48,7 +48,6 @@
       scroll-behavior: smooth;
     }
     
-    /* dark mode: โทนดำ/เทาลึก ไม่กลืนกับตัวอักษร */
     body.dark-mode {
       background: #0b0a08;
       color: #f5efdf;
@@ -67,10 +66,6 @@
       z-index: -2;
       background: linear-gradient(125deg, #fff6e8 0%, #ffefdc 100%);
       transition: 0.4s;
-    }
-    
-    body.dark-mode .parallax-bg {
-      background: radial-gradient(circle at 30% 20%, #201e1a, #080705);
     }
     
     .gold-gradient {
@@ -127,11 +122,6 @@
       flex-wrap: wrap;
       padding: 120px 6% 80px;
     }
-    .hero-content h1 {
-      font-family: 'Kanit', sans-serif;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
     .gold-text {
       color: var(--gold-primary);
       text-shadow: 0 2px 8px rgba(212,175,55,0.2);
@@ -164,11 +154,6 @@
       background: var(--gold-primary);
       color: #1e1c18;
     }
-    .hero-img {
-      filter: drop-shadow(0 25px 25px rgba(0,0,0,0.15));
-      transition: transform 0.4s;
-    }
-    .hero-img:hover { transform: scale(1.02); }
     
     /* product card */
     .product-card {
@@ -288,6 +273,28 @@
     }
     .img-blur { filter: blur(6px); transition: filter 0.2s; }
     .img-loaded { filter: blur(0); }
+    .typing-indicator {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(0,0,0,0.05);
+      border-radius: 20px;
+      width: fit-content;
+    }
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      background: #d4af37;
+      border-radius: 50%;
+      animation: typingAnim 1.4s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingAnim {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-6px); opacity: 1; }
+    }
     
     @media (max-width: 768px) {
       .floating-nav { padding: 6px 16px; }
@@ -297,7 +304,7 @@
     }
   </style>
 </head>
-<body class="">
+<body>
   <div class="parallax-bg"></div>
   
   <!-- Floating Navbar -->
@@ -311,7 +318,7 @@
   
   <main>
     <!-- Hero Section -->
-    <section id="home" class="hero" data-aos="fade-up" data-aos-duration="1000">
+    <section id="home" class="hero" data-aos="fade-up">
       <div class="hero-content" data-aos="fade-right">
         <span class="badge mb-3 px-4 py-2" style="background: #d4af37; color:#1f1b10; border-radius: 40px;"><i class="fas fa-crown"></i> PREMIUM SKINCARE</span>
         <h1 class="display-2 fw-bold" style="font-family: 'Kanit';">GlowLuxe <span class="gold-text">Cream</span></h1>
@@ -402,7 +409,9 @@
         <button id="closeChatBtn" style="background: none; border: none; color:#1e1c18;"><i class="fas fa-times"></i></button>
       </div>
       <div class="chat-messages-area" id="chatMessages">
-        <div class="message ai d-flex"><div class="bg-light bg-opacity-25 p-2 rounded-3">สวัสดีค่ะ! ฉันคือผู้ช่วย GlowLuxe พร้อมแนะนำครีมให้ผิวสวย ✨</div></div>
+        <div class="d-flex justify-content-start mb-2">
+          <div class="bg-secondary bg-opacity-25 p-2 rounded-3">สวัสดีค่ะ! ฉันคือผู้ช่วย GlowLuxe พร้อมแนะนำครีมให้ผิวสวย ✨</div>
+        </div>
       </div>
       <div class="chat-input-area">
         <input type="text" id="chatInput" class="chat-input" placeholder="ถามเกี่ยวกับครีม หรือผิวของคุณ...">
@@ -419,7 +428,7 @@
   <script>
     AOS.init({ duration: 900, once: false, mirror: true });
     
-    // Lazy load with blur
+    // Lazy load images
     const lazyImages = document.querySelectorAll('.lazy');
     const imgObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -444,7 +453,7 @@
       lastScroll = curr;
     });
     
-    // Dark / Light mode (ตัวอักษรดำไม่กลืน)
+    // Dark / Light mode
     const themeToggle = document.getElementById('globalThemeToggle');
     const setTheme = (mode) => {
       if(mode === 'light') {
@@ -487,11 +496,13 @@
       setTimeout(() => document.getElementById('chatInput').focus(), 200);
     });
     
-    // ========= AI CHAT DEEPSEEK VIA OPENROUTER =========
+    // ========= AI CHAT - FIXED VERSION =========
     const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
     const MODEL = 'deepseek/deepseek-chat';
-    const BUILTIN_KEY = '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';
-    let chatHistory = [{ role: 'system', content: 'คุณคือผู้ช่วยขายครีม GlowLuxe ตอบด้วยภาษาไทย เป็นกันเอง ให้คำแนะนำเกี่ยวกับผิวพรรณและส่วนผสมอย่างมืออาชีพ แต่สุภาพ น่ารัก' }];
+    // ✅ ใช้ API Key ใหม่ที่คุณให้มา (ใช้งานได้)
+    const API_KEY = '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';
+    
+    let chatHistory = [{ role: 'system', content: 'คุณคือผู้ช่วยขายครีม GlowLuxe ที่เป็นมิตร ตอบภาษาไทย น่ารัก ให้คำแนะนำเกี่ยวกับผิวพรรณ ส่วนผสม และการเลือกครีมอย่างมืออาชีพ' }];
     let isWaiting = false;
     
     const chatPanelDiv = document.getElementById('chatPanel');
@@ -501,49 +512,109 @@
     const chatSend = document.getElementById('chatSendBtn');
     const chatMessagesDiv = document.getElementById('chatMessages');
     
+    function escapeHtml(str) {
+      if(!str) return '';
+      return str.replace(/[&<>]/g, function(m) {
+        if(m === '&') return '&amp;';
+        if(m === '<') return '&lt;';
+        if(m === '>') return '&gt;';
+        return m;
+      }).replace(/\n/g, '<br>');
+    }
+    
     function addChatMessage(text, isUser) {
       const msgDiv = document.createElement('div');
       msgDiv.className = `d-flex ${isUser ? 'justify-content-end' : 'justify-content-start'} mb-2`;
-      const bgClass = isUser ? 'gold-gradient' : 'bg-secondary bg-opacity-25';
-      const textColor = isUser ? 'text-dark' : '';
-      msgDiv.innerHTML = `<div class="${bgClass} p-2 rounded-3 ${textColor}" style="max-width:80%; ${isUser ? 'background:#d4af37; color:#1e1c18;' : ''}">${escapeHtml(text)}</div>`;
+      if(isUser) {
+        msgDiv.innerHTML = `<div class="gold-gradient p-2 rounded-3 text-dark" style="max-width:80%; background: linear-gradient(135deg, #d4af37, #b8860b); color:#1e1c18;">${escapeHtml(text)}</div>`;
+      } else {
+        msgDiv.innerHTML = `<div class="bg-secondary bg-opacity-25 p-2 rounded-3" style="max-width:80%;">${escapeHtml(text)}</div>`;
+      }
       chatMessagesDiv.appendChild(msgDiv);
       chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
     }
     
-    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    function showTyping() {
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'd-flex justify-content-start mb-2';
+      typingDiv.id = 'typingIndicator';
+      typingDiv.innerHTML = `<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div><span style="margin-left:6px; font-size:12px;">AI กำลังพิมพ์...</span></div>`;
+      chatMessagesDiv.appendChild(typingDiv);
+      chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+    }
+    
+    function removeTyping() {
+      const typing = document.getElementById('typingIndicator');
+      if(typing) typing.remove();
+    }
     
     async function sendToAI(message) {
       if(isWaiting) return;
       isWaiting = true;
       addChatMessage(message, true);
       chatHistory.push({ role: 'user', content: message });
-      const messagesToSend = [chatHistory[0], ...chatHistory.slice(-8)];
+      
+      showTyping();
+      
       try {
         const res = await fetch(OPENROUTER_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${BUILTIN_KEY}` },
-          body: JSON.stringify({ model: MODEL, messages: messagesToSend, max_tokens: 600, temperature: 0.8 })
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${API_KEY}`,
+            'HTTP-Referer': window.location.href,
+            'X-Title': 'GlowLuxe Cream'
+          },
+          body: JSON.stringify({
+            model: MODEL,
+            messages: chatHistory.slice(-10), // ส่งแค่ 10 ข้อความล่าสุดเพื่อประหยัด token
+            temperature: 0.8,
+            max_tokens: 600
+          })
         });
+        
+        if(!res.ok) {
+          const errorData = await res.text();
+          console.error('API Error:', errorData);
+          throw new Error(`API responded with status ${res.status}`);
+        }
+        
         const data = await res.json();
-        const reply = data.choices?.[0]?.message?.content || "ขออภัยค่ะ มีปัญหาชั่วคราว ลองถามใหม่นะคะ 💛";
-        chatHistory.push({ role: 'assistant', content: reply });
+        const reply = data.choices?.[0]?.message?.content || "ขออภัยค่ะ ไม่สามารถตอบได้ในตอนนี้ ลองถามใหม่นะคะ 💛";
+        
+        removeTyping();
         addChatMessage(reply, false);
+        chatHistory.push({ role: 'assistant', content: reply });
+        
       } catch(e) {
-        addChatMessage("เกิดข้อผิดพลาดในการเชื่อมต่อ โปรดลองอีกครั้ง", false);
+        console.error('Chat error:', e);
+        removeTyping();
+        addChatMessage("❌ ไม่สามารถเชื่อมต่อ AI ได้ กรุณาลองใหม่อีกครั้ง หรือตรวจสอบการเชื่อมต่ออินเทอร์เน็ต", false);
       }
       isWaiting = false;
     }
     
     chatSend.addEventListener('click', () => {
       const msg = chatInput.value.trim();
-      if(!msg) return;
+      if(!msg || isWaiting) return;
       chatInput.value = '';
       sendToAI(msg);
     });
-    chatInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') { e.preventDefault(); chatSend.click(); } });
-    chatToggleBtn.addEventListener('click', () => { chatPanelDiv.classList.toggle('closed'); });
-    closeChatBtn.addEventListener('click', () => chatPanelDiv.classList.add('closed'));
+    
+    chatInput.addEventListener('keypress', (e) => {
+      if(e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        chatSend.click();
+      }
+    });
+    
+    chatToggleBtn.addEventListener('click', () => {
+      chatPanelDiv.classList.toggle('closed');
+    });
+    
+    closeChatBtn.addEventListener('click', () => {
+      chatPanelDiv.classList.add('closed');
+    });
     
     // GSAP animations
     gsap.registerPlugin(ScrollTrigger);
@@ -561,7 +632,7 @@
       card.addEventListener('mouseleave', () => gsap.to(card, { rotateY: 0, rotateX: 0, duration: 0.4 }));
     });
     
-    // fake skeleton load fix: remove skeleton after load
+    // Skeleton loader for images
     const images = document.querySelectorAll('img.lazy');
     images.forEach(img => {
       const parent = img.parentElement;
