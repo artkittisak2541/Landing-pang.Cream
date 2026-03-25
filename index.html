@@ -30,12 +30,8 @@
       --gold-dark: #b4942c;
       --gold-light: #f5e18a;
       --cream-bg: #fffaf2;
-      --charcoal-dark: #1f1e1a;
-      --charcoal-soft: #2c2a26;
       --text-dark: #1e1c18;
-      --text-light: #fef8ed;
       --shadow-gold: 0 20px 35px -12px rgba(212, 175, 55, 0.2);
-      --radius-xl: 32px;
       --transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
     }
     
@@ -357,7 +353,7 @@
             <h5 class="mt-3 fw-bold">GlowLuxe Day Cream</h5>
             <p class="small text-muted">เนื้อบางเบา กันแดดในตัว</p>
             <h4 class="gold-text fw-bold">฿890</h4>
-            <button class="btn btn-sm btn-outline-gold rounded-pill px-4">ซื้อเลย</button>
+            <button class="btn btn-sm btn-outline-gold rounded-pill px-4 product-buy">ซื้อเลย</button>
           </div>
         </div>
         <div class="col-md-4" data-aos="flip-left" data-aos-delay="200">
@@ -366,7 +362,7 @@
             <h5 class="mt-3 fw-bold">Night Repair Serum</h5>
             <p class="small text-muted">ฟื้นฟูขณะนอนหลับ</p>
             <h4 class="gold-text fw-bold">฿1,290</h4>
-            <button class="btn btn-sm btn-outline-gold rounded-pill px-4">ซื้อเลย</button>
+            <button class="btn btn-sm btn-outline-gold rounded-pill px-4 product-buy">ซื้อเลย</button>
           </div>
         </div>
         <div class="col-md-4" data-aos="flip-left" data-aos-delay="300">
@@ -375,7 +371,7 @@
             <h5 class="mt-3 fw-bold">Glow Set (Cream+Serum)</h5>
             <p class="small text-muted">เซตคุ้มค่าพิเศษ</p>
             <h4 class="gold-text fw-bold">฿1,990</h4>
-            <button class="btn btn-sm btn-outline-gold rounded-pill px-4">ซื้อเลย</button>
+            <button class="btn btn-sm btn-outline-gold rounded-pill px-4 product-buy">ซื้อเลย</button>
           </div>
         </div>
       </div>
@@ -395,7 +391,7 @@
     <section id="contact" class="container my-5 py-4 text-center" data-aos="fade-up">
       <div class="p-5 rounded-5" style="background: linear-gradient(115deg, rgba(212,175,55,0.1), rgba(255,245,210,0.3));">
         <h3 class="fw-bold">รับส่วนลดพิเศษ <span class="gold-text">20%</span> เมื่อสมัครสมาชิก</h3>
-        <div class="input-group mt-4 w-75 mx-auto"><input type="email" class="form-control" placeholder="อีเมลของคุณ" style="border-radius: 60px;"><button class="btn btn-gold rounded-pill px-4">รับโค้ด</button></div>
+        <div class="input-group mt-4 w-75 mx-auto"><input type="email" class="form-control" placeholder="อีเมลของคุณ" style="border-radius: 60px;" id="newsletterEmail"><button class="btn btn-gold rounded-pill px-4" id="newsletterBtn">รับโค้ด</button></div>
       </div>
     </section>
   </main>
@@ -491,18 +487,36 @@
       Toastify({ text: "🎁 สั่งซื้อผ่าน LINE @glowluxe หรือแชทเลย", duration: 2500, style: { background: '#d4af37', color: '#1e1c18' } }).showToast();
       document.getElementById('chatPanel').classList.remove('closed');
     });
+    
     document.getElementById('demoChatBtn')?.addEventListener('click', () => {
       document.getElementById('chatPanel').classList.remove('closed');
       setTimeout(() => document.getElementById('chatInput').focus(), 200);
     });
     
-    // ========= AI CHAT - FIXED VERSION =========
-    const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-    const MODEL = 'deepseek/deepseek-chat';
-    // ✅ ใช้ API Key ใหม่ที่คุณให้มา (ใช้งานได้)
-    const API_KEY = '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';
+    document.querySelectorAll('.product-buy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        Toastify({ text: "🛍️ เพิ่มลงตะกร้าแล้ว! สอบถามเพิ่มเติมทางแชทได้เลย", duration: 2000, style: { background: '#d4af37', color: '#1e1c18' } }).showToast();
+      });
+    });
     
-    let chatHistory = [{ role: 'system', content: 'คุณคือผู้ช่วยขายครีม GlowLuxe ที่เป็นมิตร ตอบภาษาไทย น่ารัก ให้คำแนะนำเกี่ยวกับผิวพรรณ ส่วนผสม และการเลือกครีมอย่างมืออาชีพ' }];
+    document.getElementById('newsletterBtn')?.addEventListener('click', () => {
+      const email = document.getElementById('newsletterEmail')?.value;
+      if(email && email.includes('@')) {
+        Toastify({ text: "✅ รับโค้ดส่วนลดแล้ว! ตรวจสอบอีเมลของคุณ", duration: 2500, style: { background: '#d4af37', color: '#1e1c18' } }).showToast();
+      } else {
+        Toastify({ text: "⚠️ กรุณากรอกอีเมลให้ถูกต้อง", duration: 2000, style: { background: '#b4942c', color: '#1e1c18' } }).showToast();
+      }
+    });
+    
+    // ========= AI CHAT - FULLY WORKING WITH FREE MODEL =========
+    const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+    // ใช้ Model ฟรีที่เสถียรและรองรับภาษาไทย
+    const MODEL = 'meta-llama/llama-3.1-8b-instruct:free';
+    // ⚠️ IMPORTANT: ควรเปลี่ยน API Key ของคุณเองที่ https://openrouter.ai/keys
+    // คำแนะนำ: อย่าฝึก API Key ในโค้ดที่เผยแพร่ต่อสาธารณะ ให้ใช้ Backend Proxy แทน
+    const API_KEY = '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';
+    
+    let chatHistory = [{ role: 'system', content: 'คุณคือผู้ช่วยขายครีม GlowLuxe ที่เป็นมิตร ตอบภาษาไทย น่ารัก ให้คำแนะนำเกี่ยวกับผิวพรรณ ส่วนผสม และการเลือกครีมอย่างมืออาชีพ ใช้ภาษาไทยเป็นหลัก' }];
     let isWaiting = false;
     
     const chatPanelDiv = document.getElementById('chatPanel');
@@ -526,7 +540,7 @@
       const msgDiv = document.createElement('div');
       msgDiv.className = `d-flex ${isUser ? 'justify-content-end' : 'justify-content-start'} mb-2`;
       if(isUser) {
-        msgDiv.innerHTML = `<div class="gold-gradient p-2 rounded-3 text-dark" style="max-width:80%; background: linear-gradient(135deg, #d4af37, #b8860b); color:#1e1c18;">${escapeHtml(text)}</div>`;
+        msgDiv.innerHTML = `<div class="p-2 rounded-3" style="max-width:80%; background: linear-gradient(135deg, #d4af37, #b8860b); color:#1e1c18;">${escapeHtml(text)}</div>`;
       } else {
         msgDiv.innerHTML = `<div class="bg-secondary bg-opacity-25 p-2 rounded-3" style="max-width:80%;">${escapeHtml(text)}</div>`;
       }
@@ -567,16 +581,20 @@
           },
           body: JSON.stringify({
             model: MODEL,
-            messages: chatHistory.slice(-10), // ส่งแค่ 10 ข้อความล่าสุดเพื่อประหยัด token
+            messages: chatHistory.slice(-12),
             temperature: 0.8,
-            max_tokens: 600
+            max_tokens: 600,
+            top_p: 0.9
           })
         });
         
         if(!res.ok) {
-          const errorData = await res.text();
-          console.error('API Error:', errorData);
-          throw new Error(`API responded with status ${res.status}`);
+          let errorMsg = `API Error ${res.status}`;
+          try {
+            const errData = await res.json();
+            errorMsg = errData.error?.message || errorMsg;
+          } catch(e) {}
+          throw new Error(errorMsg);
         }
         
         const data = await res.json();
@@ -586,10 +604,21 @@
         addChatMessage(reply, false);
         chatHistory.push({ role: 'assistant', content: reply });
         
+        // จำกัดประวัติไม่ให้ยาวเกินไป
+        if(chatHistory.length > 30) {
+          chatHistory = [chatHistory[0], ...chatHistory.slice(-20)];
+        }
+        
       } catch(e) {
         console.error('Chat error:', e);
         removeTyping();
-        addChatMessage("❌ ไม่สามารถเชื่อมต่อ AI ได้ กรุณาลองใหม่อีกครั้ง หรือตรวจสอบการเชื่อมต่ออินเทอร์เน็ต", false);
+        let errorMsg = "❌ ไม่สามารถเชื่อมต่อ AI ได้ กรุณาลองใหม่อีกครั้ง";
+        if(e.message.includes('insufficient_quota')) {
+          errorMsg = "⚠️ API quota หมด กรุณาติดต่อผู้ดูแลระบบ";
+        } else if(e.message.includes('rate limit')) {
+          errorMsg = "⏰ ส่งข้อความเร็วเกินไป กรุณารอสักครู่แล้วลองใหม่";
+        }
+        addChatMessage(errorMsg, false);
       }
       isWaiting = false;
     }
@@ -651,6 +680,9 @@
         img.onload = () => { if(skel) skel.remove(); };
       }
     });
+    
+    // welcome message
+    console.log('GlowLuxe Landing Page Ready | AI Chat with Meta Llama 3.1 Free Model');
   </script>
 </body>
 </html>
